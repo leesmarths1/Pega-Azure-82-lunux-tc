@@ -1,0 +1,98 @@
+sudo su
+
+sudo yum install -y java-1.8.0 wget
+
+sudo groupadd tomcat
+sudo useradd -g tomcat -d /opt/tomcat -s /bin/nologin tomcat
+
+sudo wget http://www-us.apache.org/dist/tomcat/tomcat-9/v9.0.17/bin/apache-tomcat-9.0.17.tar.gz
+
+sudo tar -zxvf apache-tomcat-*.tar.gz
+sudo mv apache-tomcat-*/* /opt/tomcat/
+
+sudo chown -R tomcat:tomcat /opt/tomcat/
+
+sudo vi /etc/systemd/system/tomcat.service
+
+************Copy this in to the VI editor**********
+
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/jre
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat/
+Environment=CATALINA_BASE=/opt/tomcat/
+Environment='CATALINA_OPTS=-server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/bin/kill -15 $MAINPID
+
+User=tomcat
+Group=tomcat
+
+[Install]
+WantedBy=multi-user.target
+
+***************************************************
+
+sudo systemctl daemon-reload
+
+sudo systemctl start tomcat
+
+sudo systemctl enable tomcat
+
+sudo firewall-cmd --zone=public --add-port=8080/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+sudo firewall-cmd --reload
+
+sudo systemctl restart tomcat
+
+*******************************Manual Start Stop Of Tomcat Server*****************
+
+sudo sh /opt/tomcat/bin/startup.sh
+
+sudo sh /opt/tomcat/bin/shutdown.sh
+
+**View Logs of tomcat
+sudo tail -n 200 -f /opt/tomcat/logs/catalina.out
+
+sudo systemctl status tomcat.service
+
+**Check ports of tomcat
+sudo netstat -lnp | grep 6645
+
+**Check process id of tomcat
+sudo ps -ef | grep tomcat
+
+** check the process of tomcat
+sudo ps aux | grep 'tomcatd'
+
+
+**********************************************************************************
+
+**************Pega tomcat Config**********************
+
+sudo mkdir -p /logs/pega
+sudo chown -R tomcat:tomcat /logs/pega
+
+sudo mv web.xml /opt/tomcat/conf/ 
+sudo mv prconfig.xml /opt/
+sudo mv prlog4j2.xml /opt/
+sudo mv tomcat-users.xml /opt/tomcat/conf/
+sudo mv context.xml /opt/tomcat/conf/
+sudo mv setenv.sh /opt/tomcat/bin/
+sudo mv prhelp.war /opt/tomcat/webapps/prhelp.war
+sudo mv META-INF/context.xml /opt/tomcat/webapps/manager/META-INT/context.xml
+sudo mv prcluster_service.war /opt/tomcat/webapps/prcluster_service.war
+sudo mv prweb.war /opt/tomcat/webapps/prweb.war
+sudo mv server.xml /opt/tomcat/conf/server.xml
+sudo mv mssql-jdbc-6.2.2.jre8.jar /opt/tomcat/lib/mssql-jdbc-6.2.2.jre8.jar
+sudo mv ojdbc8.jar /opt/tomcat/lib/ojdbc8.jar
+
+********************************************************
