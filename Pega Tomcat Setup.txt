@@ -96,3 +96,11 @@ sudo mv mssql-jdbc-6.2.2.jre8.jar /opt/tomcat/lib/mssql-jdbc-6.2.2.jre8.jar
 sudo mv ojdbc8.jar /opt/tomcat/lib/ojdbc8.jar
 
 ********************************************************
+
+**** jdbc replacement script
+
+sudo rm /opt/tomcat/lib/mssql-jdbc-6.2.2.jre8.jar
+sudo mv mssql-jdbc-7.2.2.jre8.jar /opt/tomcat/lib/mssql-jdbc-7.2.2.jre8.jar
+sudo systemctl restart tomcat
+
+sudo vi /opt/tomcat/bin/setenv.sh
